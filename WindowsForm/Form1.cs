@@ -96,33 +96,62 @@ namespace WindowsForm
             #endregion
 
             #region Paralelismo
-            var directorioActual = AppDomain.CurrentDomain.BaseDirectory;
-            var destinoBaseSecuencial = Path.Combine(directorioActual, @"Imagenes\resultado-secuencial");
-            var destinoBaseParalelo = Path.Combine(directorioActual, @"Imagenes\resultado-paralelo");
-            PrepararEjecucion(destinoBaseParalelo, destinoBaseSecuencial);
+            //var directorioActual = AppDomain.CurrentDomain.BaseDirectory;
+            //var destinoBaseSecuencial = Path.Combine(directorioActual, @"Imagenes\resultado-secuencial");
+            //var destinoBaseParalelo = Path.Combine(directorioActual, @"Imagenes\resultado-paralelo");
+            //PrepararEjecucion(destinoBaseParalelo, destinoBaseSecuencial);
 
-            var imagenes = ObtenerImagenes();
-            // Ejemplo secuencial
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            //var imagenes = ObtenerImagenes();
+            //// Ejemplo secuencial
+            //var stopwatch = new Stopwatch();
+            //stopwatch.Start();
 
-            foreach (var imagen in imagenes)
-            {
-                await ProcesarImagen(destinoBaseSecuencial, imagen);
-            }
+            //foreach (var imagen in imagenes)
+            //{
+            //    await ProcesarImagen(destinoBaseSecuencial, imagen);
+            //}
 
-            double tiempoSecuencial = stopwatch.ElapsedMilliseconds / 1000.0;
+            //double tiempoSecuencial = stopwatch.ElapsedMilliseconds / 1000.0;
 
-            Console.WriteLine("Procesamiento secuencial: {0} segundos", tiempoSecuencial);
+            //Console.WriteLine("Procesamiento secuencial: {0} segundos", tiempoSecuencial);
 
-            stopwatch.Restart();
-            // Ejemplo paralelo
-            var imagenesTareas = imagenes.Select(async imagen => await ProcesarImagen(destinoBaseParalelo, imagen));
-            await Task.WhenAll(imagenesTareas);
+            //stopwatch.Restart();
+            //// Ejemplo paralelo
+            //var imagenesTareas = imagenes.Select(async imagen => await ProcesarImagen(destinoBaseParalelo, imagen));
+            //await Task.WhenAll(imagenesTareas);
 
-            double tiempoParalelo = stopwatch.ElapsedMilliseconds / 1000.0;
+            //double tiempoParalelo = stopwatch.ElapsedMilliseconds / 1000.0;
 
-            Console.WriteLine("Procesamiento parelelo: {0} segundos", tiempoParalelo);
+            //Console.WriteLine("Procesamiento parelelo: {0} segundos", tiempoParalelo);
+
+            //EscribirComparacion(tiempoSecuencial, tiempoParalelo);
+
+            #endregion
+
+            #region Ejemplo_ParallelFor
+            var columnasMatA = 1100;
+            var filas = 1000;
+            var columnasMatB = 1750;
+
+            var matrizA = OperacionesMatrices.InicializarMatriz(filas, columnasMatA);
+            var matrizB = OperacionesMatrices.InicializarMatriz(columnasMatA, columnasMatB);
+            var resultado = new double[filas, columnasMatB];
+
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            await Task.Run(() => OperacionesMatrices.MultiplicarMatricesSecuencial(matrizA, matrizB, resultado));
+
+            var tiempoSecuencial = stopWatch.ElapsedMilliseconds / 1000.0;
+            Console.WriteLine("Duración de operación secuencual: {0} segundos",tiempoSecuencial);
+
+            resultado = new double[filas, columnasMatB];
+            stopWatch.Restart();
+
+            await Task.Run(() => OperacionesMatrices.MultiplicarMatricesParalelo(matrizA, matrizB, resultado));
+
+            var tiempoParalelo = stopWatch.ElapsedMilliseconds / 1000.0;
+            Console.WriteLine("Duración de operación paralela: {0} segundos", tiempoParalelo);
 
             EscribirComparacion(tiempoSecuencial, tiempoParalelo);
 
